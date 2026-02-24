@@ -1,0 +1,25 @@
+# Sentry Antivirus - Custom Signatures
+# Always protects your stuff!
+#
+# Add custom virus signatures here
+# Format: YAML
+
+version: "1.0"
+last_updated: "2024-01-01"
+
+# Hash-based signatures (SHA256)
+hashes:
+  # EICAR test file
+  - hash: "275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f"
+    name: "EICAR-Test-File"
+    level: "LOW"
+    description: "EICAR antivirus test file - not a real threat"
+
+# Pattern-based signatures
+patterns:
+  # Example pattern for test purposes
+  - name: "Test.Pattern.Example"
+    pattern: "THIS_IS_A_TEST_SIGNATURE_PATTERN"
+    is_regex: false
+    level: "LOW"
+    description: "Test signature pattern for verification"
