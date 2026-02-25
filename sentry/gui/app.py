@@ -80,6 +80,10 @@ class SentryApp(ctk.CTk):
         self.views = {}
         self._create_views()
 
+        # Sync sidebar indicator to actual initial state (DISABLED) so it
+        # matches the dashboard instead of showing the hardcoded default
+        self._update_protection_status()
+
         # Show dashboard by default
         self._show_view("dashboard")
 
@@ -235,18 +239,21 @@ class SentryApp(ctk.CTk):
         """Start real-time protection in background"""
         def start():
             self.realtime_protection.start()
-            # Schedule UI updates on the main thread once protection is running
-            self.after(0, self._update_protection_status)
-            self.after(0, lambda: self.views["dashboard"]._update_status()
-                       if "dashboard" in self.views else None)
+            # Protection is now running — schedule both UI updates on the main thread
+            self.after(0, self._sync_all_status)
 
-        thread = threading.Thread(target=start, daemon=True)
-        thread.start()
+        threading.Thread(target=start, daemon=True).start()
+
+    def _sync_all_status(self):
+        """Update sidebar indicator and dashboard to reflect current protection state"""
+        self._update_protection_status()
+        if "dashboard" in self.views:
+            self.views["dashboard"]._update_status()
 
     def _update_protection_status(self):
-        """Update protection status indicator"""
+        """Update sidebar protection status indicator"""
         status = self.realtime_protection.get_status()
-        
+
         if status == ProtectionStatus.ENABLED:
             self.status_indicator.configure(text="● Protected", text_color="#00D26A")
         elif status == ProtectionStatus.PAUSED:
@@ -259,11 +266,13 @@ class SentryApp(ctk.CTk):
     def toggle_realtime_protection(self, enabled: bool):
         """Toggle real-time protection on/off"""
         if enabled:
+            # start() is async — the background thread calls _sync_all_status when done
             self._start_realtime_protection()
         else:
+            # stop() is synchronous, so update UI immediately
             self.realtime_protection.stop()
-        
-        self._update_protection_status()
+            self._sync_all_status()
+
         self.config.set("realtime_protection_enabled", enabled)
 
     def _setup_tray(self):
