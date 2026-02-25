@@ -1,13 +1,15 @@
 """
 Sentry Antivirus - Main GUI Application
-Always protects your stuff!
+Always protects your computer!
 """
 
 import os
 import sys
 import threading
+from pathlib import Path
 import customtkinter as ctk
 from tkinter import filedialog, messagebox
+from PIL import Image
 from typing import Optional
 
 from .dashboard import DashboardView
@@ -43,9 +45,22 @@ class SentryApp(ctk.CTk):
         self.geometry("1100x700")
         self.minsize(900, 600)
 
+        # Set window icon
+        icon_path = Path(__file__).parent / "icon.png"
+        if icon_path.exists():
+            self._icon_image = ctk.CTkImage(
+                light_image=Image.open(icon_path),
+                dark_image=Image.open(icon_path),
+                size=(32, 32)
+            )
+            icon_photo = Image.open(icon_path).resize((32, 32))
+            from PIL import ImageTk
+            self._icon_photo = ImageTk.PhotoImage(icon_photo)
+            self.wm_iconphoto(True, self._icon_photo)
+
         # Set appearance
         ctk.set_appearance_mode(self.config.get("appearance_mode", "dark"))
-        ctk.set_default_color_theme("blue")
+        ctk.set_default_color_theme(str(Path(__file__).parent / "theme.json"))
 
         # Configure grid
         self.grid_rowconfigure(0, weight=1)
@@ -84,16 +99,25 @@ class SentryApp(ctk.CTk):
         logo_frame = ctk.CTkFrame(self.sidebar, fg_color="transparent")
         logo_frame.grid(row=0, column=0, padx=20, pady=(20, 10))
 
+        icon_path = Path(__file__).parent / "icon.png"
+        if icon_path.exists():
+            sidebar_icon = ctk.CTkImage(
+                light_image=Image.open(icon_path),
+                dark_image=Image.open(icon_path),
+                size=(48, 48)
+            )
+            ctk.CTkLabel(logo_frame, image=sidebar_icon, text="").pack()
+
         self.logo_label = ctk.CTkLabel(
             logo_frame,
-            text="🛡️ Sentry",
+            text="Sentry",
             font=ctk.CTkFont(size=24, weight="bold")
         )
         self.logo_label.pack()
 
         self.tagline_label = ctk.CTkLabel(
             logo_frame,
-            text="Always protects your stuff!",
+            text="Always protects your computer!",
             font=ctk.CTkFont(size=11),
             text_color="gray"
         )

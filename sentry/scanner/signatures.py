@@ -1,6 +1,6 @@
 """
 Sentry Antivirus - Virus Signature Database
-Always protects your stuff!
+Always protects your computer!
 """
 
 import os

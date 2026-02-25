@@ -1,6 +1,6 @@
 """
 Sentry Antivirus - Core Scanning Engine
-Always protects your stuff!
+Always protects your computer!
 """
 
 import os

@@ -1,6 +1,6 @@
 """
 Sentry Antivirus - Quarantine View
-Always protects your stuff!
+Always protects your computer!
 """
 
 import customtkinter as ctk

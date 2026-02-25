@@ -1,6 +1,6 @@
 """
 Sentry Antivirus Setup Script
-Always protects your stuff!
+Always protects your computer!
 """
 
 from setuptools import setup, find_packages

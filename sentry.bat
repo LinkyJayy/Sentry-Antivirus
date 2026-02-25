@@ -1,12 +1,12 @@
 @echo off
 :: Sentry Antivirus Launcher
-:: Always protects your stuff!
+:: Always protects your computer!
 
 title Sentry Antivirus
 echo.
 echo  =======================================
 echo      Sentry Antivirus v1.0.0
-echo      Always protects your stuff!
+echo      Always protects your computer!
 echo  =======================================
 echo.
 

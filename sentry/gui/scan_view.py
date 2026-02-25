@@ -1,6 +1,6 @@
 """
 Sentry Antivirus - Scan View
-Always protects your stuff!
+Always protects your computer!
 """
 
 import os

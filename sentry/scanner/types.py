@@ -1,6 +1,6 @@
 """
 Sentry Antivirus - Scanner Types
-Always protects your stuff!
+Always protects your computer!
 """
 
 from enum import Enum

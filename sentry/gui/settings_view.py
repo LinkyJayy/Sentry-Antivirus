@@ -1,6 +1,6 @@
 """
 Sentry Antivirus - Settings View
-Always protects your stuff!
+Always protects your computer!
 """
 
 import customtkinter as ctk
@@ -267,7 +267,7 @@ class SettingsView(ctk.CTkFrame):
 
         tagline = ctk.CTkLabel(
             about_frame,
-            text="Always protects your stuff!",
+            text="Always protects your computer!",
             font=ctk.CTkFont(size=13),
             text_color="gray"
         )

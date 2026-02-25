@@ -1,11 +1,14 @@
 """
 Sentry Antivirus - Dashboard View
-Always protects your stuff!
+Always protects your computer!
 """
 
+from pathlib import Path
 import customtkinter as ctk
+from PIL import Image
 from datetime import datetime
 from typing import TYPE_CHECKING
+from .widgets import AnimatedSwitch
 
 if TYPE_CHECKING:
     from .app import SentryApp
@@ -78,11 +81,21 @@ class DashboardView(ctk.CTkFrame):
         card.grid(row=0, column=0, padx=(0, 10), pady=(0, 10), sticky="nsew")
 
         # Status icon and text
-        self.status_icon = ctk.CTkLabel(
-            card,
-            text="🛡️",
-            font=ctk.CTkFont(size=64)
-        )
+        gui_dir = Path(__file__).parent
+        rtp_on_path = gui_dir / "rtp_on.png"
+        rtp_off_path = gui_dir / "rtp_off.png"
+        self._rtp_on_image = ctk.CTkImage(
+            light_image=Image.open(rtp_on_path),
+            dark_image=Image.open(rtp_on_path),
+            size=(80, 80)
+        ) if rtp_on_path.exists() else None
+        self._rtp_off_image = ctk.CTkImage(
+            light_image=Image.open(rtp_off_path),
+            dark_image=Image.open(rtp_off_path),
+            size=(80, 80)
+        ) if rtp_off_path.exists() else None
+
+        self.status_icon = ctk.CTkLabel(card, image=self._rtp_on_image, text="")
         self.status_icon.pack(pady=(30, 10))
 
         self.status_text = ctk.CTkLabel(
@@ -112,9 +125,8 @@ class DashboardView(ctk.CTkFrame):
         )
         toggle_label.pack(side="left", padx=(0, 10))
 
-        self.protection_toggle = ctk.CTkSwitch(
+        self.protection_toggle = AnimatedSwitch(
             toggle_frame,
-            text="",
             command=self._on_protection_toggle,
             onvalue=True,
             offvalue=False
@@ -268,14 +280,17 @@ class DashboardView(ctk.CTkFrame):
         status = self.realtime_protection.get_status()
         
         if status == ProtectionStatus.ENABLED:
+            self.status_icon.configure(image=self._rtp_on_image)
             self.status_text.configure(text="You're Protected", text_color="#00D26A")
             self.status_detail.configure(text="Real-time protection is active")
             self.protection_toggle.select()
         elif status == ProtectionStatus.PAUSED:
+            self.status_icon.configure(image=self._rtp_on_image)
             self.status_text.configure(text="Protection Paused", text_color="#FFB800")
             self.status_detail.configure(text="Real-time protection is paused")
             self.protection_toggle.select()
         else:
+            self.status_icon.configure(image=self._rtp_off_image)
             self.status_text.configure(text="At Risk", text_color="#FF4444")
             self.status_detail.configure(text="Real-time protection is disabled")
             self.protection_toggle.deselect()

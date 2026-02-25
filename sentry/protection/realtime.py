@@ -1,6 +1,6 @@
 """
 Sentry Antivirus - Real-time Protection Monitor
-Always protects your stuff!
+Always protects your computer!
 """
 
 import os

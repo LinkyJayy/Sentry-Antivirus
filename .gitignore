@@ -26,7 +26,11 @@ wheels/
 
 # PyInstaller
 *.manifest
-*.spec
+# sentry.spec is intentionally tracked
+!sentry.spec
+
+# Virtual environments
+.venv/
 
 # Installer logs
 pip-log.txt

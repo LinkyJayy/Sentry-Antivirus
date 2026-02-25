@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 🛡️ Sentry Antivirus
-Always protects your stuff!
+Always protects your computer!
 
 Main entry point for the Sentry Antivirus application.
 Supports both GUI and CLI modes.

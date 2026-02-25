@@ -1,6 +1,6 @@
 """
 Sentry Antivirus - Quarantine Manager
-Always protects your stuff!
+Always protects your computer!
 """
 
 import os
