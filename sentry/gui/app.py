@@ -10,6 +10,7 @@ from pathlib import Path
 import customtkinter as ctk
 from tkinter import filedialog, messagebox
 from PIL import Image
+import pystray
 from typing import Optional
 
 from .dashboard import DashboardView
@@ -86,7 +87,10 @@ class SentryApp(ctk.CTk):
         if self.config.get("realtime_protection_enabled", True):
             self._start_realtime_protection()
 
-        # Set up closing handler
+        # Set up system tray
+        self._setup_tray()
+
+        # Set up closing handler (minimize to tray)
         self.protocol("WM_DELETE_WINDOW", self._on_closing)
 
     def _create_sidebar(self):
@@ -231,8 +235,11 @@ class SentryApp(ctk.CTk):
         """Start real-time protection in background"""
         def start():
             self.realtime_protection.start()
-            self._update_protection_status()
-        
+            # Schedule UI updates on the main thread once protection is running
+            self.after(0, self._update_protection_status)
+            self.after(0, lambda: self.views["dashboard"]._update_status()
+                       if "dashboard" in self.views else None)
+
         thread = threading.Thread(target=start, daemon=True)
         thread.start()
 
@@ -259,6 +266,43 @@ class SentryApp(ctk.CTk):
         self._update_protection_status()
         self.config.set("realtime_protection_enabled", enabled)
 
+    def _setup_tray(self):
+        """Set up the system tray icon"""
+        icon_path = Path(__file__).parent / "icon.png"
+        tray_image = Image.open(icon_path) if icon_path.exists() else \
+                     Image.new("RGBA", (64, 64), "#03fc88")
+
+        menu = pystray.Menu(
+            pystray.MenuItem("Open Sentry", self._show_window, default=True),
+            pystray.Menu.SEPARATOR,
+            pystray.MenuItem("Quit", self._quit_app),
+        )
+
+        self._tray_icon = pystray.Icon(
+            "Sentry Antivirus",
+            tray_image,
+            "Sentry Antivirus",
+            menu,
+        )
+
+        threading.Thread(target=self._tray_icon.run, daemon=True).start()
+
+    def _show_window(self, *_):
+        """Restore window from tray"""
+        self.after(0, self._restore_window)
+
+    def _restore_window(self):
+        self.deiconify()
+        self.lift()
+        self.focus_force()
+
+    def _quit_app(self, *_):
+        """Fully quit the application"""
+        self._tray_icon.stop()
+        self.realtime_protection.stop()
+        self.config.save()
+        self.after(0, self.destroy)
+
     def show_notification(self, title: str, message: str, type_: str = "info"):
         """Show a notification to the user"""
         if type_ == "error":
@@ -273,15 +317,8 @@ class SentryApp(ctk.CTk):
         self._show_view(view_name)
 
     def _on_closing(self):
-        """Handle window closing"""
-        # Stop real-time protection
-        self.realtime_protection.stop()
-        
-        # Save config
-        self.config.save()
-        
-        # Close window
-        self.destroy()
+        """Minimize to tray instead of closing"""
+        self.withdraw()
 
 
 def main():
