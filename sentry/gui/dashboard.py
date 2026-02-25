@@ -299,7 +299,6 @@ class DashboardView(ctk.CTkFrame):
         """Handle protection toggle"""
         enabled = self.protection_toggle.get()
         self.app.toggle_realtime_protection(enabled)
-        self._update_status()
 
     def _start_quick_scan(self):
         """Start a quick scan"""
